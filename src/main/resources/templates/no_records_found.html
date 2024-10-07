@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>No Records Found</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            text-align: center;
+            padding: 50px;
+        }
+        h2 {
+            color: #f44336; /* Red color */
+        }
+        p {
+            color: #666;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #2196F3; /* Blue color */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #1976D2; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <h2>No Records Found</h2>
+    <p>Sorry, there are no customers matching your search criteria.</p>
+    <a class="btn" href="/home">Back to Search</a>
+</body>
+</html>

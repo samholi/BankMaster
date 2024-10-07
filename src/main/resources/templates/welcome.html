@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        .message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+            max-width: 320px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+        p {
+            font-family: Arial;
+            font-size: 14px;
+            color: #666;
+        }
+        .logout {
+            display: inline-block;
+            width: 10%;
+            max-width: 320px;
+            padding: 8px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            background-color: #ff4d4d;
+            color: white;
+            text-align: center;
+            text-decoration: none; /* Removes underline from the link */
+            transition: background-color 0.3s ease;
+        }
+        .logout:hover {
+            background-color: #e04343;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">
+        <p th:text="'Welcome, '  + ${firstname} +  ' ! You have logged in successfully.'"></p>
+    </div>
+    <div class="container">
+        <h2>Welcome to Our Website</h2>
+        <h2 th:text="${firstname}"></h2>
+    </div>
+    <a href="/logout" class="logout">Logout</a>
+</body>
+</html>
+
+
+
+
+
+ 

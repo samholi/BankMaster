@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: separate;
+            border-spacing: 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid black;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        /* Rounded corners for specific edges */
+        thead th:first-child {
+            border-top-left-radius: 8px;
+        }
+        thead th:last-child {
+            border-top-right-radius: 8px;
+        }
+        tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 8px;
+        }
+        tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 8px;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #2196F3; /* Blue color */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #1976D2; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <center><h2>Search Results</h2></center>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Organization Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="organization : ${organizations}">
+                <td th:text="${organization.id}"></td>
+                <td th:text="${organization.organizationname}"></td>
+                <td th:text="${organization.email}"></td>
+                <td th:text="${organization.phone}"></td>
+            </tr>
+        </tbody>
+    </table>
+   <center><a class="btn" href="/search_organization">Back to Search</a></center> 
+</body>
+</html>

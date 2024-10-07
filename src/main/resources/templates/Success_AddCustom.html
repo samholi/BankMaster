@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        .message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .customer-details {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">
+        Successfully Added
+    </div>
+
+    <div class="customer-details" th:if="${customer}">
+    <h3>Customer Details:</h3>
+    <p><strong>First Name:</strong> <span th:text="${customer.firstname}"></span></p>
+    <p><strong>Last Name:</strong> <span th:text="${customer.lastname}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${customer.email}"></span></p>
+    <p><strong>Phone No.:</strong> <span th:text="${customer.phone}"></span></p>
+</div>
+
+
+    <div class="button-container">
+        <a href="/add_customer" class="button">Add Another</a>
+    </div>
+</body>
+</html>

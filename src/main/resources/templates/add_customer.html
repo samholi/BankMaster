@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Module Tabs</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		/* Body Styles */
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f4f4f4;
+			margin: 0;
+			padding-top: 60px;
+			/* Space for the fixed navbar */
+			padding-left: 200px;
+			/* Space for the fixed menu */
+		}
+
+		/* Navbar Styles */
+		.navbar {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 60px;
+			background-color: #333;
+			display: flex;
+			align-items: center;
+			padding: 0 20px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			z-index: 1100;
+			/* Ensure navbar is on top */
+		}
+
+		.navbar .logo {
+			max-height: 40px;
+			margin-right: auto;
+		}
+
+		.navbar .logout-button a {
+			display: inline-block;
+			padding: 10px 20px;
+			border-radius: 5px;
+			background-color: #dc3545;
+			color: white;
+			text-decoration: none;
+			transition: background-color 0.3s ease;
+		}
+
+		.navbar .logout-button a:hover {
+			background-color: #c82333;
+		}
+
+		.navbar .user-icon {
+			position: relative;
+			margin-left: 20px;
+		}
+
+		.navbar .user-icon button {
+			border: none;
+			background-color: #007bff;
+			color: white;
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-size: 18px;
+			cursor: pointer;
+		}
+
+		.navbar .user-icon .user-details {
+			display: none;
+			position: absolute;
+			top: 100%;
+			right: 0;
+			background-color: #ffffff;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			padding: 10px;
+			width: 200px;
+			z-index: 1200;
+			/* Higher z-index to ensure it overlaps other elements */
+			margin: 16px auto;
+		}
+
+		.navbar .user-icon .user-details a {
+			display: block;
+			text-decoration: none;
+			color: #007bff;
+			margin-bottom: 10px;
+		}
+
+		.navbar .user-icon .user-details a:hover {
+			text-decoration: underline;
+		}
+
+		.navbar .user-icon.active .user-details {
+			display: block;
+		}
+
+
+		.secondary-navbar {
+			position: fixed;
+			top: 60px;
+			left: 200px;
+			/* Space from the menu container */
+			width: calc(100% - 200px);
+			/* Full width minus the menu width */
+			height: 45px;
+			background-color: #706c6c;
+			color: white;
+			display: flex;
+			align-items: center;
+			padding: 0 20px;
+			z-index: 1050;
+			text-align: center;
+		}
+
+		.secondary-navbar h3 {
+			color: white;
+			text-decoration: solid;
+			margin-left: 575px;
+
+
+		}
+
+		/* Menu Container */
+		.menu-container {
+			position: fixed;
+			top: 60px;
+			left: 0;
+			width: 200px;
+			height: calc(100vh - 60px);
+			background-color: #ffffff;
+			box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+			overflow-y: auto;
+			z-index: 1000;
+		}
+
+		.menu-container ul {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		.menu-container ul li {
+			padding: 15px;
+			border-bottom: 1px solid #ccc;
+			text-align: center;
+			background-color: #f8f9fa;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.menu-container ul li:hover {
+			background-color: #e2e6ea;
+		}
+
+		.menu-container ul li a {
+			text-decoration: none;
+			color: #333;
+			display: flex;
+			align-items: center;
+			width: 100%;
+		}
+
+		.menu-container ul li i {
+			font-size: 18px;
+			color: #333;
+		}
+
+		.dropdown-menu {
+			position: relative;
+			display: flex;
+			align-items: center;
+		}
+
+		.dropdown-menu select {
+			padding: 10px;
+			border: none;
+			background-color: #f8f9fa;
+			font-size: 16px;
+			cursor: pointer;
+			border-radius: 5px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			outline: none;
+		}
+
+		.dropdown-menu select:hover {
+			background-color: #e2e6ea;
+		}
+
+		/* Main Content Styles */
+		.main-content {
+			margin-left: 200px;
+			/* Same as menu width */
+			padding: 20px;
+			position: relative;
+		}
+
+		/* Secondary Menu for Forms */
+		/* Secondary Menu for Forms */
+		.form-menu {
+			position: fixed;
+			top: 70px;
+			/* Adjust as needed for vertical positioning */
+			left: 220px;
+			/* Space from the left */
+			display: flex;
+			flex-direction: column;
+			padding-top: 59px;
+			gap: 10px;
+			/* Space between buttons */
+			z-index: 1000;
+			/* Ensure it stays on top of other content */
+		}
+
+		.form-menu button {
+			padding: 10px 20px;
+			border: none;
+			background-color: #007bff;
+			color: white;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+			width: 200px;
+			/* Optional: Set a fixed width */
+		}
+
+		.form-menu button.active,
+		.form-menu button:hover {
+			background-color: #696867;
+		}
+
+
+		/* Form Container */
+		.form-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding-right: 410px;
+			padding-top: 50px;
+		}
+
+		.form-box {
+			background-color: #ffffff;
+			padding: 20px;
+			border-radius: 10px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			width: 180%;
+			max-width: 500px;
+			display: none;
+			/* Hidden by default */
+		}
+
+		.form-box.active {
+			display: block;
+		}
+
+		.form-box h2 {
+			margin-bottom: 20px;
+			text-align: center;
+			color: #333;
+		}
+
+		.form-box .form-group {
+			margin-bottom: 15px;
+		}
+
+		.form-box .form-group label {
+			display: block;
+			margin-bottom: 5px;
+			color: #555;
+		}
+
+		.form-box .form-group input {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+		}
+
+		.form-box .submit-button {
+			text-align: center;
+		}
+
+		.form-box .submit-button button {
+			padding: 10px 20px;
+			border: none;
+			background-color: #28a745;
+			color: white;
+			border-radius: 5px;
+			margin-top: 15px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
+
+		.form-box .submit-button button:hover {
+			background-color: #218838;
+		}
+
+		.Account-type {
+			position: relative;
+			display: flex;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+
+		.Account-type select {
+			padding: 10px;
+			margin-left: 15px;
+			border: none;
+			background-color: #f8f9fa;
+			font-size: 15px;
+			cursor: pointer;
+			border-radius: 5px;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+			outline: none;
+		}
+		
+	textarea {
+    width: 100%; /* Makes the textarea span the full width of its container */
+    padding: 10px; /* Adds space inside the textarea */
+    border: 1px solid #ccc; /* Adds a border */
+    border-radius: 4px; /* Rounds the corners */
+    box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+}
+	</style>
+</head>
+
+<body>
+	<!-- Navbar with Logo, Logout Button, and User Icon -->
+	<div class="navbar">
+		<img style="border-radius:10px;width: 50px;"
+			src="https://media.licdn.com/dms/image/v2/D4D0BAQH8VdbyuY3QhA/company-logo_200_200/company-logo_200_200/0/1704270419417?e=2147483647&v=beta&t=QREDXpthLMxwOr3K-E9yNU-4jbZPAHGiPHMSGmv3pGQ"
+			alt="Logo" class="logo">
+		<div class="logout-button">
+			<a th:href="@{/logout}">Logout</a>
+		</div>
+		<div class="user-icon">
+			<button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
+			<div class="user-details">
+            <p><strong th:text="'Name: ' + ${user1.firstname} +' ' + ${user1.lastname}"></strong></p>
+				<a th:href="@{/profile}">Profile</a>
+				<a th:href="@{/settings}">Settings</a>
+				<a th:href="@{/logout}">Logout</a>
+			</div>
+		</div>
+	</div>
+
+	<!-- Secondary Navbar -->
+	<div class="secondary-navbar">
+		<center>
+			<h3>Dashboard</h3>
+		</center>
+	</div>
+
+	<!-- Menu Container with Dropdown -->
+	<div class="menu-container">
+		<ul>
+			<li class="dropdown-menu">
+				<i class="fas fa-search"></i>
+				<select onchange="handleDropdownChange(event)">
+					<option value="/search-customer">Customer</option>
+					<option value="/search-organization">Organization</option>
+				</select>
+			</li>
+			<li><i class="fas fa-user"></i><a th:href="@{/user}">User</a></li>
+			<li><i class="fas fa-file-alt"></i><a th:href="@{/report}">Report</a></li>
+			<li><i class="fas fa-cogs"></i><a th:href="@{/setting}">Setting</a></li>
+			<li><i class="fas fa-question-circle"></i><a th:href="@{/help}">Help</a></li>
+		</ul>
+	</div>
+
+
+
+	<!-- Main Content Area -->
+	<div class="main-content">
+		<!-- Secondary Menu for Forms -->
+		<div class="form-menu">
+			<button class="active" onclick="showForm('basic-info')">Basic Info</button>
+			<button onclick="showForm('account-details')">Account Details</button>
+			<button onclick="showForm('education-details')">Education Details</button>
+			<button onclick="showForm('upload-document')">Upload Document</button>
+		</div>
+
+		<!-- Form Container -->
+		<div class="form-container">
+			<!-- All forms combined into one -->
+			<form th:action="@{/add_customer}" method="post" enctype="multipart/form-data" th:object="${customer}">
+
+				<!-- Basic Info Form -->
+				<div id="basic-info" class="form-box active">
+					<h2>Basic Information</h2>
+					<div class="form-group">
+						<label for="fname">First Name:</label>
+						<input type="text" id="fname" name="firstname" required>
+					</div>
+					<div class="form-group">
+						<label for="lname">Last Name:</label>
+						<input type="text" id="lname" name="lastname" required>
+					</div>
+					<div class="form-group">
+						<label for="email">Email:</label>
+						<input type="email" id="email" name="email" required pattern="[a-zA-Z0-9._%+-]+@gmail\.com"
+							title="Please enter a valid Gmail address (e.g., user@gmail.com)">
+					</div>
+					<div class="form-group">
+						<label for="phoneno">Phone Number:</label>
+						<input type="tel" id="phoneno" name="phone" pattern="[0-9]{10}"
+							title="Phone number must be 10 digits" required>
+					</div>
+					<div class="form-group">
+						<label for="address">Address:</label>
+						<input type="text" id="address" name="address" required>
+					</div>
+					<div class="form-group">
+						<label for="dob">Date of Birth:</label>
+						<input type="date" id="dob" name="dob" required>
+					</div>
+
+					<div class="submit-button">
+						<button type="button" onclick="validateForm() ,generateAccountNumber()">Next</button>
+					</div>
+				</div>
+
+				<!-- Account Details Form -->
+				<div id="account-details" class="form-box">
+					<h2>Account Details</h2>
+					<div class="form-group">
+						<label for="accname">Account Holder Name:</label>
+						<input type="text" id="accname" name="account_holder_name" required>
+					</div>
+					<div class="form-group Account-type">
+						<label for="accountType">Account Type:</label>
+						<select id="accountType" name="accountType" required>
+							
+							<option value="saving">Saving</option>
+							<option value="fd">FD</option>
+							<option value="loan">Loan</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="accno">Account Number:</label>
+						<input type="text" id="accno" name="accountNo" required>
+					</div>
+					<div class="form-group">
+						<label for="branch">Branch Name:</label>
+						<input type="text" id="branch" name="branch" required>
+					</div>
+					<div class="form-group">
+						<label for="deposite">Deposit Amount:</label>
+						<input type="number" id="deposite" name="deposite_amount" required>
+					</div>
+					<div class="form-group">
+						<label for="hold">Hold Amount:</label>
+						<input type="number" id="hold" name="hold" required>
+					</div>
+					<div class="submit-button">
+
+						<button type="button" onclick="validateForm(),showForm('education-details')">Next</button>
+					</div>
+				</div>
+
+				<!-- Education Details Form -->
+				<div id="education-details" class="form-box">
+					<h2>Education Details</h2>
+					<div class="form-group">
+						<label for="ssc">SSC School:</label>
+						<input type="text" id="ssc" name="ssc_school" required>
+					</div>
+					<div class="form-group">
+						<label for="hsc">HSC/Diploma College:</label>
+						<input type="text" id="hsc" name="hsc_school" required>
+					</div>
+					<div class="form-group">
+						<label for="university">University/College:</label>
+						<input type="text" id="university" name="university" required>
+					</div>
+					<div class="submit-button">
+						<button type="button" onclick="showForm('upload-document')">Next</button>
+					</div>
+				</div>
+
+				<!-- Upload Document Form -->
+				<!-- Upload Document Form -->
+				<div id="upload-document" class="form-box">
+					<h2>Upload Documents</h2>
+					<div class="form-group">
+						<label for="docid">Document Id:</label>
+						<input type="text" id="docid" name="document_id" required readonly>
+					</div>
+
+
+					<div class="form-group Account-type">
+						<label for="docType1">Document Type 1:</label>
+						<select id="docType1" name="document_type1" required>
+							<option value="">Select Document Type</option>
+							<option value="pan">PAN Card</option>
+							<option value="aadhar">Aadhar Card</option>
+							<option value="driving">Driving Licence</option>
+						</select>
+					</div>
+
+					<div class="form-group" id="pan-group1" style="display: none;">
+						<label for="documentFile1">PAN Card:</label>
+						<input type="file" id="documentFile1" name="documentFile1" accept=".pdf,.jpg,.png">
+					</div>
+
+					<div class="form-group" id="aadhar-group1" style="display: none;">
+						<label for="documentFile1">Aadhar Card:</label>
+						<input type="file" id="documentFile1" name="documentFile1" accept=".pdf,.jpg,.png">
+					</div>
+
+					<div class="form-group" id="driving-group1" style="display: none;">
+						<label for="documentFile1">Driving Licence:</label>
+						<input type="file" id="documentFile1" name="documentFile1" accept=".pdf,.jpg,.png">
+					</div>
+
+					<div class="form-group Account-type">
+						<label for="docType2">Document Type 2:</label>
+						<select id="docType2" name="document_type2" required>
+							<option value="">Select Document Type</option>
+							<option value="pan">PAN Card</option>
+							<option value="aadhar">Aadhar Card</option>
+							<option value="driving">Driving Licence</option>
+						</select>
+					</div>
+
+					<div class="form-group" id="pan-group2" style="display: none;">
+						<label for="documentFile2">PAN Card:</label>
+						<input type="file" id="documentFile2" name="documentFile2" accept=".pdf,.jpg,.png">
+					</div>
+
+					<div class="form-group" id="aadhar-group2" style="display: none;">
+						<label for="documentFile2">Aadhar Card:</label>
+						<input type="file" id="documentFile2" name="documentFile2" accept=".pdf,.jpg,.png">
+					</div>
+
+					<div class="form-group" id="driving-group2" style="display: none;">
+						<label for="documentFile2">Driving Licence:</label>
+						<input type="file" id="documentFile2" name="documentFile2" accept=".pdf,.jpg,.png">
+					</div>
+
+
+
+
+					<div class="form-group">
+						<label for="uploaddate">Upload Date:</label>
+						<input type="date" id="uploaddate" name="upload_date" required>
+					</div>
+					<div class="form-group">
+						<label for="note">Note:</label>
+						<textarea id="note" name="note" rows="4" cols="50"
+							placeholder="Enter your note here"></textarea>
+					</div>
+
+					<!-- More document fields if needed... -->
+					<div class="submit-button">
+						<button type="submit">Submit</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	</div>
+
+	<!-- Scripts -->
+	<script>
+
+		function validateForm() {
+			// Get form field values
+			var email = document.getElementById("email").value;
+			var phone = document.getElementById("phoneno").value;
+
+			// Validate Gmail email address
+			var emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+			if (!emailPattern.test(email)) {
+				alert("Please enter a valid Gmail address (e.g., user@gmail.com).");
+				return false;
+			}
+
+			// Validate phone number for exactly 10 digits
+			var phonePattern = /^[0-9]{10}$/;
+			if (!phonePattern.test(phone)) {
+				alert("Phone number must be exactly 10 digits.");
+				return false;
+			}
+
+			// If all validations pass, proceed to the next form step
+			showForm('account-details');
+		}
+        function validateForm2() {
+    		// Get the deposit amount and hold amount from the form
+    		var depositAmount = document.getElementById('deposit').value;
+    		var holdAmount = document.getElementById('hold').value;
+
+    		// Convert string input to numbers	
+    		depositAmount = Number(depositAmount);
+    		holdAmount = Number(holdAmount);
+
+    		// Check if hold amount is greater than or equal to the deposit amount
+    		if (holdAmount >= depositAmount) {
+        	// Show an alert message
+        	alert('Hold amount should be less than the deposit amount.');
+        	// Prevent the form from submitting
+        	event.preventDefault();
+    		}
+			}
+
+		// Function to check if all fields in the current form are filled
+		function validateCurrentForm(formId) {
+			var currentForm = document.getElementById(formId);
+			var inputs = currentForm.querySelectorAll('input[required]');
+			for (var i = 0; i < inputs.length; i++) {
+				if (!inputs[i].value) {
+					alert('Please fill out all required fields');
+					return false;
+				}
+			}
+			return true;
+		}
+
+		function showForm(formId) {
+			var activeForm = document.querySelector('.form-box.active').id;
+
+			// Validate the current form before moving to the next one
+			if (!validateCurrentForm(activeForm)) {
+				return; // Stop if validation fails
+			}
+
+			var buttons = document.querySelectorAll('.form-menu button');
+			buttons.forEach(function (btn) {
+				btn.classList.remove('active');
+			});
+			var clickedButton = Array.from(buttons).find(btn => btn.getAttribute('onclick').includes(formId));
+			if (clickedButton) {
+				clickedButton.classList.add('active');
+			}
+			var forms = document.querySelectorAll('.form-box');
+			forms.forEach(function (form) {
+				form.classList.remove('active');
+			});
+			document.getElementById(formId).classList.add('active');
+		}
+
+		function toggleUserDetails(event) {
+			event.stopPropagation(); // Prevent the event from propagating to the document
+			var userIcon = document.querySelector('.user-icon');
+			userIcon.classList.toggle('active');
+		}
+
+		function handleDropdownChange(event) {
+			var selectedValue = event.target.value;
+			if (selectedValue) {
+				window.location.href = selectedValue;
+			}
+		}
+
+		// Close user details if clicking outside
+		document.addEventListener('click', function (event) {
+			var userIcon = document.querySelector('.user-icon');
+			var userDetails = document.querySelector('.user-details');
+			if (!userIcon.contains(event.target)) {
+				userIcon.classList.remove('active');
+			}
+		});
+
+		function generateAccountNumber() {
+			// Generate a random number between 10000000000 and 99999999999
+			var accountNumber = Math.floor(Math.random() * (99999999999 - 10000000000 + 1)) + 10000000000;
+			// Set the account number to the input field
+			document.getElementById('accno').value = accountNumber;
+		}
+
+		function showForm(formId) {
+			var activeForm = document.querySelector('.form-box.active').id;
+
+			// Validate the current form before moving to the next one
+			if (!validateCurrentForm(activeForm)) {
+				return; // Stop if validation fails
+			}
+
+			var buttons = document.querySelectorAll('.form-menu button');
+			buttons.forEach(function (btn) {
+				btn.classList.remove('active');
+			});
+			var clickedButton = Array.from(buttons).find(btn => btn.getAttribute('onclick').includes(formId));
+			if (clickedButton) {
+				clickedButton.classList.add('active');
+			}
+			var forms = document.querySelectorAll('.form-box');
+			forms.forEach(function (form) {
+				form.classList.remove('active');
+			});
+			document.getElementById(formId).classList.add('active');
+		}
+
+		function validateCurrentForm(formId) {
+			var currentForm = document.getElementById(formId);
+			var inputs = currentForm.querySelectorAll('input[required]');
+			for (var i = 0; i < inputs.length; i++) {
+				if (!inputs[i].value) {
+					alert('Please fill out all required fields');
+					return false;
+				}
+			}
+			return true;
+		}
+
+		function generateAccountNumber() {
+			// Generate an 11-digit account number
+			const accountNumber = '00000000000' + Math.floor(Math.random() * 100000000000);
+			document.getElementById('accno').value = accountNumber.slice(-11);
+		}
+
+
+		
+//------------------------------------Upload Document Dropdown ------------------------------
+//on selecting upload document display related.......
+document.getElementById('docType1').addEventListener('change', function() {
+    var selectedValue1 = this.value;
+
+    // Hide all file input groups
+    document.getElementById('pan-group1').style.display = 'none';
+    document.getElementById('aadhar-group1').style.display = 'none';
+    document.getElementById('driving-group1').style.display = 'none';
+
+    // Show the relevant file input group based on selected document type
+    if (selectedValue1 === 'pan') {
+        document.getElementById('pan-group1').style.display = 'block';
+    } else if (selectedValue1 === 'aadhar') {
+        document.getElementById('aadhar-group1').style.display = 'block';
+    } else if (selectedValue1 === 'driving') {
+        document.getElementById('driving-group1').style.display = 'block';
+    }
+
+    // Update options in the second dropdown based on the first dropdown's selection
+    updateSecondDropdown(selectedValue1);
+});
+
+document.getElementById('docType2').addEventListener('change', function() {
+    var selectedValue2 = this.value;
+
+    // Hide all file input groups
+    document.getElementById('pan-group2').style.display = 'none';
+    document.getElementById('aadhar-group2').style.display = 'none';
+    document.getElementById('driving-group2').style.display = 'none';
+
+    // Show the relevant file input group based on selected document type
+    if (selectedValue2 === 'pan') {
+        document.getElementById('pan-group2').style.display = 'block';
+    } else if (selectedValue2 === 'aadhar') {
+        document.getElementById('aadhar-group2').style.display = 'block';
+    } else if (selectedValue2 === 'driving') {
+        document.getElementById('driving-group2').style.display = 'block';
+    }
+});
+
+function updateSecondDropdown(selectedValue1) {
+    var docType2 = document.getElementById('docType2');
+    var options = docType2.options;
+
+    // Enable all options first
+    for (var i = 1; i < options.length; i++) {
+        options[i].style.display = 'block';
+    }
+
+    // Disable the selected value in the first dropdown
+    for (var i = 1; i < options.length; i++) {
+        if (options[i].value === selectedValue1) {
+            options[i].style.display = 'none';
+        }
+    }
+
+    // Reset the second dropdown if the selected value matches
+    if (docType2.value === selectedValue1) {
+        docType2.value = '';
+        document.getElementById('pan-group2').style.display = 'none';
+        document.getElementById('aadhar-group2').style.display = 'none';
+        document.getElementById('driving-group2').style.display = 'none';
+    }
+}
+
+
+//Generate Dodument Id randomly
+document.addEventListener('DOMContentLoaded', function() {
+    function generateDocumentId() {
+        // Generate a 6-digit number
+        const min = 100000;
+        const max = 999999;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Set the generated ID to the input field
+    document.getElementById('docid').value = generateDocumentId();
+});
+
+
+	</script>
+
+</body>
+
+</html>
