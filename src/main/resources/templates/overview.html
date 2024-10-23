@@ -411,6 +411,61 @@
 }
     
 
+.user-details {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    z-index: 1;
+}
+
+.user-image-large {
+    font-size: 50px;
+    color: #333;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.logout-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color:  #dc3545;
+    color: black;
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.edit2-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: rgb(0, 138, 0);
+    color: white;
+font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Show user details on button click */
+.user-icon.active .user-details {
+    display: block;
+}
         
     </style>
 </head>
@@ -427,35 +482,25 @@
           <span class="detail-item"><strong> DOB: </strong> <span th:text="${customer.dob}"></span></span>
 			    <span class="detail-item"><strong>Email:</strong> <span th:text="${customer.email}"></span></span>
 
-    
- 
-    
-    <!--<div  class="customer-details">
-        <strong>Account No:</strong>
-        <span th:each="account, iterStat : ${customer.accounts}"
-              th:text="${iterStat.last ? account.accountNo : account.accountNo + ' ,  '}">
-        </span>
-    </div>-->
-
 </div>
 
 
     
     
-    <div class="user-icon">
-        <button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
-        <div class="user-details">
-            <p><strong th:text="'Name: ' + ${user1.firstname} +' ' + ${user1.lastname}"></strong></p>
-            <a href="/profile">Profile</a>
-            <a href="/settings">Settings</a>
-            <a href="/logout">Logout</a>
-        </div>
+   <div class="user-icon">
+			<button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
+			 <div class="user-details">
+        <i class="fas fa-user user-image-large"></i>
+        <p class="user-name" th:text="'' + ${user1.firstname} +' ' + ${user1.lastname}">Sameer</p>
+        <a style="color:white;" th:href="@{/logout}" class="edit2-button">Edit</a>
+        <a style="color:white;" th:href="@{/logout}" class="logout-button">Logout</a>
     </div>
-</div>
+		</div>
+	</div>
 
 
  <!-- Sidebar for User Details -->
-    <div class="user-details-sidebar">
+     <div class="user-details-sidebar">
     <div class="user-icon">
         <div class="image-upload-container">
             <img src="https://t3.ftcdn.net/jpg/05/17/79/88/360_F_517798849_WuXhHTpg2djTbfNf0FQAjzFEoluHpnct.jpg" alt="User Icon" class="user-image">
@@ -495,9 +540,9 @@
     <div class="nav-left">
         <!-- Other nav items can go here if needed -->
     </div>
-    <div class="nav-right">
+   <!--- <div class="nav-right">
         <button class="add-task-button">Add Task</button>
-    </div>
+    </div>-->
 </div>
 
 
@@ -507,9 +552,9 @@
          <a th:href="@{/overview/{id}(id=${customer.id})}" class="active" >Overview</a>
          
 		<a th:href="@{/account/{id}/{accountNo}(id=${customer.id}, accountNo=${account.accountNo})}">Account</a>
-        <a href="/profile">Profile</a>
-        <a href="/contact-details">Contact Details</a>
-        <a href="/documents">Documents</a>
+        <a th:href="@{/profile/{id}(id=${customer.id})}">Profile</a>
+        <a th:href="@{/contact/{id}(id=${customer.id})}">Contact Details</a>
+        <a th:href="@{/document/{id}(id=${customer.id})}">Documents</a>
     </div>
 </div>
 
@@ -677,22 +722,44 @@
         });
     
     	
-       function previewImage(event) {
-        // Get the selected file from the file input
-        var input = event.target;
-        var reader = new FileReader();
+  
+    async function previewAndSubmitImage(event, id) {
+        const input = event.target;
+        const reader = new FileReader();
         
-        // When the file is loaded, display it in the image element
+        // Preview the image as soon as it's selected
         reader.onload = function() {
-            var image = document.querySelector('.user-image');
+            const image = document.getElementById('userImage');
             image.src = reader.result; // Set the image source to the loaded file
+            image.style.display = 'block'; // Ensure the image is visible
         };
-
-        // If a file was selected, read it as a Data URL
+        
         if (input.files && input.files[0]) {
             reader.readAsDataURL(input.files[0]);
+
+            // Create a FormData object to send the image
+            const formData = new FormData();
+            formData.append("file", input.files[0]);
+
+            // Fetch POST request to upload the image
+            const response = await fetch(`/uploadImage/${id}`, {
+                method: 'POST',
+                body: formData
+            });
+
+            // Optionally handle response here
+            if (response.ok) {
+                console.log("Image uploaded successfully.");
+                // After uploading, set the image src again to ensure it's fetched from the server
+                const imageUrl = `/image/${id}`;
+                const image = document.getElementById('userImage');
+                image.src = imageUrl; // Update the source to the new image
+            } else {
+                console.error("Error uploading image.");
+            }
         }
     }
+
         
         
    

@@ -17,7 +17,7 @@ public class AccountService {
     }
     
     public Account findAccountByAccountNo(String accountNo) {
-        return accountRepository.findByAccountNo(accountNo); // Ensure this method exists in your repository
+        return accountRepository.findByAccountNo(accountNo);
     }
     
 }

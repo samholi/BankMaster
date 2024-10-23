@@ -94,6 +94,6 @@ public class Transaction {
         this.account = account;
     }
 
-    // Getters and Setters
+   
 }
 

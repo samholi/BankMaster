@@ -56,11 +56,11 @@
     flex-wrap: nowrap;
     align-items: center;
     flex-grow: 1;
-    margin-left: 110px;
+    margin-left:50px;
 }
 
 .navbar .detail-item {
-    margin-right: 20px;
+    margin-right: 45px;
      margin-left: 7%;
     white-space: nowrap;
 }
@@ -534,6 +534,61 @@
 }
 
 
+.user-details {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    z-index: 1;
+}
+
+.user-image-large {
+    font-size: 50px;
+    color: #333;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.logout-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color:  #dc3545;
+    color: black;
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.edit-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: rgb(0, 138, 0);
+    color: white;
+font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Show user details on button click */
+.user-icon.active .user-details {
+    display: block;
+}
 
         
     </style>
@@ -556,17 +611,16 @@
 
     
     
-    <div class="user-icon">
-        <button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
-        <div class="user-details">
-            <p><strong th:text="'Name: ' + ${user1.firstname} +' ' + ${user1.lastname}"></strong></p>
-            <a href="/profile">Profile</a>
-            <a href="/settings">Settings</a>
-            <a href="/logout">Logout</a>
-        </div>
+  <div class="user-icon">
+			<button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
+			 <div class="user-details">
+        <i class="fas fa-user user-image-large"></i>
+        <p class="user-name" th:text="'' + ${user1.firstname} +' ' + ${user1.lastname}">Sameer</p>
+        <a style="color:white;" th:href="@{/logout}" class="edit-button">Edit</a>
+        <a style="color:white;" th:href="@{/logout}" class="logout-button">Logout</a>
     </div>
-</div>
-
+		</div>
+	</div>
 
  <!-- Sidebar for User Details -->
      <div class="user-details-sidebar">
@@ -686,7 +740,7 @@
 <div class="position-amount-bar">
     <h3 class="left-content">Open Position (<span th:text="${totalAccountNos}">0</span>)</h3>
     <div class="right-content">
-        <h3>Total Amount: 5000</h3>
+        <h3>Total Amount: <span th:text="${totalAmount}">0</span></h3>
      </div>
 </div>
 
@@ -706,8 +760,7 @@
 
 
 
-<!--
- saving Modal -->
+<!--saving Modal -->
 <div class="modal" id="savingModal">
     <div class="modal-content">
         <h2>Create Saving Account </h2><br>
@@ -729,8 +782,19 @@
             <br><br>
             <label for="Camount"><strong>Deposite Amount:</strong><input  style="width: 80px;"type="number" id="amount" name="depositAmount" required></label>
             <br><br>
-            <label for="Camount"><strong>Hold Amount:</strong><input  style="width: 80px;"type="number" id="hold" name="hold" required></label>
+            <label for="Camount"><strong>Hold Amount:</strong><input  style="width: 80px;"type="number" id="hold" name="holdAmount" required></label>
             <br><br>
+            <label for="holdType"><strong>Hold Type:</strong></label>
+				<select style="padding: 5px; border: 2px solid #ccc; border-radius: 5px;" id="holdType" name="holdType" required>
+    				<option value="">Select Type</option>
+    				<option value="large">Large</option>
+    				<option value="medium">Medium</option>
+    				<option value="small">Small</option>
+				</select>
+			<br><br>
+			<label for="expiry"><strong>Hold Expiry:</strong></label>
+				<input style="width: 120px;" type="date" id="expiry" name="holdExpireeDate" required readonly> <!-- Set readonly to prevent manual changes -->
+				<br>
             <button type="submit">Submit</button>
         </form>
     </div>
@@ -742,13 +806,12 @@
 
 
 
-
+<!--FD Modal -->
 <div class="modal" id="fdModal">
     <div class="modal-content">
         <h2>Create FD Account </h2><br>
         <form id="creditForm" th:action="@{/account/{id}(id=${customer.id})}" th:object="${account}" method="post">
 			<strong>Customer ID:</strong>
-            <!-- Preload the customer ID in a readonly field -->
             <input type="text" style="width: 80px;" name="customerId" th:value="${customer.id}" readonly />
             <br><br>
 			<strong >Name:</strong>
@@ -764,8 +827,19 @@
             <br><br>
             <label for="Camount"><strong>Deposite Amount:</strong><input  style="width: 80px;" type="number" id="amount" name="depositAmount" required></label>
             <br><br>
-            <label for="Camount"><strong>Hold Amount:</strong><input  style="width: 80px;"type="number" id="hold" name="hold" required></label>
+            <label for="Camount"><strong>Hold Amount:</strong><input  style="width: 100px;"type="number" id="hold" name="holdAmount" required></label>
             <br><br>
+			<label for="holdType"><strong>Hold Type:</strong></label>
+				<select style="padding: 5px; border: 2px solid #ccc; border-radius: 5px;" id="holdTypeFD" name="holdType" required>
+    				<option value="">Select Type</option>
+    				<option value="large">Large</option>
+    				<option value="medium">Medium</option>
+    				<option value="small">Small</option>
+				</select>
+			<br><br>
+			<label for="expiry"><strong>Hold Expiry:</strong></label>
+				<input style="width: 120px;" type="date" id="expiryFD" name="holdExpireeDate" required readonly> <!-- Set readonly to prevent manual changes -->
+				<br><br>
             <button type="submit">Submit</button>
         </form>
     </div>
@@ -796,8 +870,19 @@
             <br><br>
             <label for="Camount"><strong>Deposite Amount:</strong><input style="width: 80px;" type="number" id="amount" name="depositAmount" required></label>
             <br><br>
-            <label for="Camount"><strong>Hold Amount:</strong><input  style="width: 80px;"type="number" id="hold" name="hold" required></label>
+            <label for="Camount"><strong>Hold Amount:</strong><input  style="width: 80px;"type="number" id="hold" name="holdAmount" required></label>
             <br><br>
+            <label for="holdType"><strong>Hold Type:</strong></label>
+				<select style="padding: 5px; border: 2px solid #ccc; border-radius: 5px;" id="holdTypeLoan" name="holdType" required>
+    				<option value="">Select Type</option>
+    				<option value="large">Large</option>
+    				<option value="medium">Medium</option>
+    				<option value="small">Small</option>
+				</select>
+			<br><br>
+			<label for="expiry"><strong>Hold Expiry:</strong></label>
+				<input style="width: 120px;" type="date" id="expiryLoan" name="holdExpireeDate" required readonly> <!-- Set readonly to prevent manual changes -->
+				<br><br>
             <button type="submit">Submit</button>
         </form>
     </div>
@@ -941,6 +1026,91 @@ function showloanDiv() {
 }
 
 
+//----------------------------------------------------------hold Savings expiry----------------------------------------------------------------------//
+
+
+	 document.addEventListener("DOMContentLoaded", function () {
+        const holdTypeSelect = document.getElementById('holdType');
+        const expiryDateInput = document.getElementById('expiry');
+
+        holdTypeSelect.addEventListener('change', function () {
+            const holdType = this.value;
+            const createdDate = new Date(); // Get the current date
+            let expiryDate;
+
+            // Calculate expiry date based on hold type
+            if (holdType === 'large') {
+                createdDate.setFullYear(createdDate.getFullYear() + 1); // Add 1 year
+            } else if (holdType === 'medium') {
+                createdDate.setMonth(createdDate.getMonth() + 3); // Add 3 months
+            } else if (holdType === 'small') {
+                createdDate.setDate(createdDate.getDate() + 10); // Add 10 days
+            }
+
+            // Format the date to yyyy-mm-dd for the input
+            expiryDate = createdDate.toISOString().split('T')[0];
+            expiryDateInput.value = expiryDate; // Set the expiry date in the input field
+        });
+    });
+    
+    
+    
+ //----------------------------------------------------------hold FD expiry----------------------------------------------------------------------//
+
+
+	 document.addEventListener("DOMContentLoaded", function () {
+        const holdTypeSelect = document.getElementById('holdTypeFD');
+        const expiryDateInput = document.getElementById('expiryFD');
+
+        holdTypeSelect.addEventListener('change', function () {
+            const holdType = this.value;
+            const createdDate = new Date(); // Get the current date
+            let expiryDate;
+
+            // Calculate expiry date based on hold type
+            if (holdType === 'large') {
+                createdDate.setFullYear(createdDate.getFullYear() + 1); // Add 1 year
+            } else if (holdType === 'medium') {
+                createdDate.setMonth(createdDate.getMonth() + 3); // Add 3 months
+            } else if (holdType === 'small') {
+                createdDate.setDate(createdDate.getDate() + 10); // Add 10 days
+            }
+
+            // Format the date to yyyy-mm-dd for the input
+            expiryDate = createdDate.toISOString().split('T')[0];
+            expiryDateInput.value = expiryDate; // Set the expiry date in the input field
+        });
+    });  
+    
+    
+//----------------------------------------------------------hold Savings expiry----------------------------------------------------------------------//
+
+
+	 document.addEventListener("DOMContentLoaded", function () {
+        const holdTypeSelect = document.getElementById('holdTypeLoan');
+        const expiryDateInput = document.getElementById('expiryLoan');
+
+        holdTypeSelect.addEventListener('change', function () {
+            const holdType = this.value;
+            const createdDate = new Date(); // Get the current date
+            let expiryDate;
+
+            // Calculate expiry date based on hold type
+            if (holdType === 'large') {
+                createdDate.setFullYear(createdDate.getFullYear() + 1); // Add 1 year
+            } else if (holdType === 'medium') {
+                createdDate.setMonth(createdDate.getMonth() + 3); // Add 3 months
+            } else if (holdType === 'small') {
+                createdDate.setDate(createdDate.getDate() + 10); // Add 10 days
+            }
+
+            // Format the date to yyyy-mm-dd for the input
+            expiryDate = createdDate.toISOString().split('T')[0];
+            expiryDateInput.value = expiryDate; // Set the expiry date in the input field
+        });
+    });     
+    
+    
     
 </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-DyZvPtDGlpW8xf1dB+0Gv9bxU1F5JZPz4QoY5C6txVt1NNSft/eAkWoSVzPxtuL6" crossorigin="anonymous"></script>

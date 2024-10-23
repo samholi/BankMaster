@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Tabs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="icon" href="images/imresizer-1725910383376.png" type="image/png">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Body Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding-top: 60px; /* Space for the fixed navbar */
+            padding-left: 200px; /* Space for the fixed menu */
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1100; /* Ensure navbar is on top */
+            color: white;
+        }
+
+        .navbar .logo {
+            max-height: 40px;
+            margin-right: auto;
+        }
+
+        .navbar .logout-button a {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #dc3545;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .navbar .customer-details {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    flex-grow: 1;
+    margin-left: 50px;
+}
+
+.navbar .detail-item {
+    margin-right: 45px;
+    margin-left: 7%;
+    white-space: nowrap;
+}
+        .navbar .logout-button a:hover {
+            background-color: #c82333;
+        }
+
+        .navbar .user-icon {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .navbar .user-icon button {
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .navbar .user-icon .user-details {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            width: 200px;
+            z-index: 1200; /* Higher z-index to ensure it overlaps other elements */
+            margin: 16px auto;
+        }
+
+        .navbar .user-icon .user-details a {
+            display: block;
+            text-decoration: none;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+		
+		.navbar .user-icon .user-details strong {
+			display: block;
+            text-decoration: none;
+            color: black;
+            margin-bottom: 10px;
+		}
+        .navbar .user-icon .user-details a:hover {
+            text-decoration: underline;
+        }
+
+        .navbar .user-icon.active .user-details {
+            display: block;
+        }
+
+
+        .secondary-navbar {
+    position: fixed;
+    top: 60px;
+    left: 0px; /* Space from the menu container */
+    width: 100%;
+    height: 45px;
+    background-color: #706c6c;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1050;
+    text-align: center;
+    justify-content: space-between; 
+}
+
+
+
+.add-task-button {
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+        
+        
+        
+        
+
+        .third-navbar {
+            position: fixed;
+            top: 100px;
+            left: 0; /* Start from the left edge */
+            width: 100%; /* Full width */
+            height: 37px;
+            background-color: #a4a4ab;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1050;
+            text-align: center;
+        }
+			
+				/* Sidebar for User Details */
+        .user-details-sidebar {
+            position: fixed;
+            top: 140px;
+            left: 0;
+            width: 240px;
+            height: 100%;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-details-sidebar .user-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .user-details-sidebar .user-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-details-sidebar .user-name {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .user-details-sidebar .user-info {
+            margin-top: 20px;
+        }
+
+        .user-details-sidebar .user-info p {
+            margin-bottom: 10px;
+        }
+       
+
+        
+        
+.image-upload-container {
+        position: relative;
+        display: inline-block; /* Make image and label inline */
+    }
+
+    .user-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .upload-icon {
+        position: absolute;
+        right: 69px; /* Adjust the distance to the right */
+        top: 4.5%;
+        transform: translateY(-50%); /* Vertically align with the image */
+        background-color: #28a745; /* Green background for the "+" sign */
+        color: white;
+        font-size: 24px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 30px;
+        cursor: pointer;
+        border: 2px solid white;
+    }
+
+    .upload-icon:hover {
+        background-color: #218838; /* Darker green on hover */
+    }
+
+.navbar-links {
+    display: flex;
+    justify-content: space-around; /* Space out links evenly */
+    width: 100%;
+}
+
+.navbar-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem; /* Slightly smaller font size */
+    padding: 5px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar-links a:hover {
+    background-color: #8a8a8a; /* Slightly darker background on hover */
+    color: #fff;
+}
+
+.navbar-links .active {
+    background-color: #6c757d; /* Default active tab background */
+    color: white; /* Text color for active tab */
+}
+
+
+
+ 
+
+
+.user-info {
+        font-family: Arial, sans-serif;
+    }
+
+    .user-info p {
+        margin: 0;
+        padding: 5px 0;
+    }
+
+    .align {
+        display: inline-block;
+        width: 300px; /* Adjust width as needed */
+        padding-left: 10px;
+    }
+    
+    .email{
+		/*display: inline-block;*/
+        width: 200px; /* Adjust the width to fit 22 characters */
+        word-break: break-all;
+	}
+
+
+.basic-info, .account-info {
+    font-family: Arial, sans-serif;
+    margin-left: 50px;
+    padding: 20px;
+    margin-bottom: -30px;
+    border-radius: 5px;
+    width: 95%;
+    background-color: white; /* Set the background color to white */
+    border: 1px solid #ddd; /* Optional: adds a border for better visibility */
+}
+
+.basic-info {
+    margin-top: 100px;
+    
+}
+
+.account-info {
+    margin-top: 50px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.edit-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    background-color: #0056b3;
+}
+.edit-button span {
+        margin-right: 5px; /* Space between icon and text */
+    }
+
+
+.basic-info h2, .account-info h2 {
+    margin-bottom: 10px;
+    color: #333;
+    font-family: 'Verdana', sans-serif
+}
+
+.info-row {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping to the next line if needed */
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+.info-field {
+    flex: 1;
+    min-width: 200px; /* Ensures fields don’t get too narrow */
+    padding: 0 10px;
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+
+.info-field strong {
+    display: inline;
+    margin-right: 5px; /* Spacing between label and value */
+}
+
+.info-field span {
+    display: inline;
+}
+   
+   
+
+.task-options {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 430px; /* Position below the button */
+    right: 5px; /* Align with the right of the button */
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1070;
+    border-radius: 7px;
+    width: 130px;
+}
+
+.task-option {
+    padding: 12px 16px;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+    
+}
+
+.task-option:hover {
+    background-color: #ddd;
+}
+    
+
+.user-details {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    z-index: 1;
+}
+
+.user-image-large {
+    font-size: 50px;
+    color: #333;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.logout-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color:  #dc3545;
+    color: black;
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.edit2-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: rgb(0, 138, 0);
+    color: white;
+font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Show user details on button click */
+.user-icon.active .user-details {
+    display: block;
+}
+        
+    </style>
+</head>
+<body>
+ <!-- Navbar with Logo, Logout Button, and User Icon -->
+<div class="navbar">
+    <img style="border-radius:10px;width: 50px;" 
+         src="https://media.licdn.com/dms/image/v2/D4D0BAQH8VdbyuY3QhA/company-logo_200_200/company-logo_200_200/0/1704270419417?e=2147483647&v=beta&t=QREDXpthLMxwOr3K-E9yNU-4jbZPAHGiPHMSGmv3pGQ" 
+         alt="Logo" class="logo">
+    
+   <div class="customer-details">
+    <span class="detail-item"><strong> Name:</strong> <span th:text="${customer.firstname} + ' ' + ${customer.lastname}"></span></span>
+        <span class="detail-item"><strong> Phone No: </strong> <span th:text="${customer.phone}"></span></span>
+          <span class="detail-item"><strong> DOB: </strong> <span th:text="${customer.dob}"></span></span>
+			    <span class="detail-item"><strong>Email:</strong> <span th:text="${customer.email}"></span></span>
+
+</div>
+
+
+    
+    
+   <div class="user-icon">
+			<button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
+			 <div class="user-details">
+        <i class="fas fa-user user-image-large"></i>
+        <p class="user-name" th:text="'' + ${user1.firstname} +' ' + ${user1.lastname}">Sameer</p>
+        <a style="color:white;" th:href="@{/logout}" class="edit2-button">Edit</a>
+        <a style="color:white;" th:href="@{/logout}" class="logout-button">Logout</a>
+    </div>
+		</div>
+	</div>
+
+
+ <!-- Sidebar for User Details -->
+     <div class="user-details-sidebar">
+    <div class="user-icon">
+        <div class="image-upload-container">
+            <img src="https://t3.ftcdn.net/jpg/05/17/79/88/360_F_517798849_WuXhHTpg2djTbfNf0FQAjzFEoluHpnct.jpg" alt="User Icon" class="user-image">
+         
+        </div>
+        <!-- Label triggers file upload input, placed below the image -->
+        <label for="file-upload" class="upload-icon">+</label>
+        <!-- Hidden file input -->
+        <input id="file-upload" type="file" accept="image/*" style="display:none;" onchange="previewImage(event)">
+    </div>
+    <div class="user-name">
+            <span th:text="${customer.firstname} + ' ' + ${customer.lastname}">Sameer Holikar</span>
+
+    </div><br>
+    <div class="user-info">
+    <div class="info-row">
+        <strong>Phone:  <span th:text="${customer.phone}"></span>
+</strong>
+    </div><br>
+    
+    <div class="info-row">
+        <strong>Email:  <span class="email" th:text="${customer.email}"></span>
+</strong>
+    </div><br>
+    <div class="info-row">
+        <strong>Address:  <span class="address email" th:text="${customer.address}"></span>
+</strong>
+    </div><br>
+    
+</div>
+</div>
+
+
+<!-- Secondary Navbar -->
+<!-- Secondary Navbar -->
+<div class="secondary-navbar">
+    <div class="nav-left">
+        <!-- Other nav items can go here if needed -->
+    </div>
+   <!--- <div class="nav-right">
+        <button class="add-task-button">Add Task</button>
+    </div>-->
+</div>
+
+
+<!-- Third Navbar -->
+    <div class="third-navbar">
+    <div class="navbar-links">
+         <a th:href="@{/overview/{id}(id=${customer.id})}" >Overview</a>
+         
+		<a th:href="@{/account/{id}/{accountNo}(id=${customer.id}, accountNo=${account.accountNo})}">Account</a>
+        <a th:href="@{/profile/{id}(id=${customer.id})}" class="active" >Profile</a>
+        <a th:href="@{/contact/{id}(id=${customer.id})}">Contact Details</a>
+        <a th:href="@{/document/{id}(id=${customer.id})}">Documents</a>
+    </div>
+</div>
+
+
+
+<div class="basic-info">
+    <div class="header">
+    <h2>Customer Information</h2>
+    <button class="edit-button" th:attr="onclick='redirectToBasicEdit(' + ${customer.id} + ')'">
+        <span>Edit</span><i class="fas fa-pencil-alt"></i>
+    </button>
+</div>
+    <hr>
+    <div class="info-row">
+            <div class="info-field">
+                <strong>Customer Id:</strong>
+                <span th:text="${customer.id}"></span>
+            </div>
+             <div class="info-field">
+                <strong>First Name:</strong>
+                <span th:text="${customer.firstname}"></span>
+            </div>
+            <div class="info-field">
+                <strong>Last Name:</strong>
+                <span th:text="${customer.lastname}"></span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-field">
+                <strong>Gender:</strong>
+                <span th:text="${customer.gender}"></span>
+            </div>
+            <div class="info-field">
+                <strong>DOB:</strong>
+                <span th:text="${customer.dob}"></span>
+            </div>
+            <div class="info-field">
+                <strong></strong>
+                <span ></span>
+            </div>
+        </div>
+</div>
+
+
+   
+
+<div class="basic-info" style="margin-top: 55px; margin-bottom: 40px;">
+    <div class="header">
+    <h2>Education Information</h2>
+    <button class="edit-button" th:attr="onclick='redirectToDocumentEdit(' + ${customer.id} + ')'">
+        <span>Edit</span><i class="fas fa-pencil-alt"></i>
+    </button>
+</div>
+    <hr>
+    <div class="info-row">
+            <div class="info-field">
+                <strong>School Name:</strong>
+                <span th:text="${customer.sscSchool}"></span>
+            </div>
+            <div class="info-field">
+                <strong>College:</strong>
+                <span th:text="${customer.hscSchool}"></span>
+            </div>
+            <div class="info-field">
+                <strong>University:</strong>
+                <span th:text="${customer.university}"></span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-field">
+                <strong></strong>
+                <span ></span>
+            </div>
+            <div class="info-field">
+                
+            </div>
+            <div class="info-field">
+               
+            </div>
+        </div>
+</div>
+   
+
+
+
+
+ 
+    
+
+    <!-- Scripts -->
+    <script>
+
+    function toggleUserDetails(event) {
+            event.stopPropagation(); // Prevent the event from propagating to the document
+            var userIcon = document.querySelector('.user-icon');
+            userIcon.classList.toggle('active');
+        }
+
+        function handleDropdownChange(event) {
+            var selectedValue = event.target.value;
+            if (selectedValue) {
+                window.location.href = selectedValue;
+            }
+        }
+
+        // Close user details if clicking outside
+        document.addEventListener('click', function(event) {
+            var userIcon = document.querySelector('.user-icon');
+            var userDetails = document.querySelector('.user-details');
+            if (!userIcon.contains(event.target)) {
+                userIcon.classList.remove('active');
+            }
+        });
+    
+    	
+  
+    async function previewAndSubmitImage(event, id) {
+        const input = event.target;
+        const reader = new FileReader();
+        
+        // Preview the image as soon as it's selected
+        reader.onload = function() {
+            const image = document.getElementById('userImage');
+            image.src = reader.result; // Set the image source to the loaded file
+            image.style.display = 'block'; // Ensure the image is visible
+        };
+        
+        if (input.files && input.files[0]) {
+            reader.readAsDataURL(input.files[0]);
+
+            // Create a FormData object to send the image
+            const formData = new FormData();
+            formData.append("file", input.files[0]);
+
+            // Fetch POST request to upload the image
+            const response = await fetch(`/uploadImage/${id}`, {
+                method: 'POST',
+                body: formData
+            });
+
+            // Optionally handle response here
+            if (response.ok) {
+                console.log("Image uploaded successfully.");
+                // After uploading, set the image src again to ensure it's fetched from the server
+                const imageUrl = `/image/${id}`;
+                const image = document.getElementById('userImage');
+                image.src = imageUrl; // Update the source to the new image
+            } else {
+                console.error("Error uploading image.");
+            }
+        }
+    }
+
+        
+        
+   
+function showForm(formId) {
+    // Hide all forms
+    const forms = document.querySelectorAll('.form-box');
+    forms.forEach(form => {
+        form.style.display = 'none';
+    });
+
+    // Remove 'active' class from all buttons
+    const buttons = document.querySelectorAll('.form-menu button');
+    buttons.forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Show the selected form
+    document.getElementById(formId).style.display = 'block';
+
+    // Add 'active' class to the clicked button
+    const activeButton = Array.from(buttons).find(button => button.textContent.toLowerCase().includes(formId.replace('-', ' ')));
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+}
+
+// Initialize by showing the first form
+document.addEventListener('DOMContentLoaded', () => {
+    showForm('basic-info');
+});
+
+
+// Select the address span element
+    const addressElement = document.querySelector('.address');
+    // Replace each comma with a comma and a line break
+    addressElement.innerHTML = addressElement.innerHTML.replace(/, /g, ',<br>');
+    
+    
+ //on clicking Edit button    
+  function redirectToBasicEdit(customerId) {
+        // Redirect to the Spring Boot controller endpoint with the customer ID
+        window.location.href = '/edit_customer/' + customerId;
+    }
+    //on clicking Edit button    
+  function redirectToDocumentEdit(customerId) {
+        // Redirect to the Spring Boot controller endpoint with the customer ID
+        window.location.href = '/edit_education/' + customerId;
+    }
+    
+    
+  function redirectToAccountEdit(accountNo, customerId) {
+    // Redirect to the Spring Boot controller endpoint with both the account number and customer ID
+    window.location.href = '/edit_account_customer/' + accountNo + '/' + customerId;
+}
+
+
+
+
+   function toggleEditOptions() {
+    var optionsDiv = document.getElementById("editOptions");
+    optionsDiv.style.display = optionsDiv.style.display === "none" ? "block" : "none";
+}
+
+function editAccount(accountType) {
+    // Redirect or show edit form for the specific account type
+    window.location.href = '/editAccount/' + accountType; // Adjust the URL as needed
+}
+
+
+
+    
+</script>
+
+</body>
+</html>

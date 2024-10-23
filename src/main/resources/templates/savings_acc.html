@@ -56,11 +56,11 @@
     flex-wrap: nowrap;
     align-items: center;
     flex-grow: 1;
-    margin-left: 110px;
+    margin-left: 50px;
 }
 
 .navbar .detail-item {
-    margin-right: 20px;
+    margin-right: 45px;
     white-space: nowrap;
         margin-left: 7%;
 
@@ -514,12 +514,67 @@ color: white;
 
 
 
+.user-details {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    z-index: 1;
+}
+
+.user-image-large {
+    font-size: 50px;
+    color: #333;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.logout-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color:  #dc3545;
+    color: black;
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.edit-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: rgb(0, 138, 0);
+    color: white;
+font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Show user details on button click */
+.user-icon.active .user-details {
+    display: block;
+}
+
 
         
     </style>
 </head>
 <body>
- <!-- Navbar with Logo, Logout Button, and User Icon -->
 <div class="navbar">
     <img style="border-radius:10px;width: 50px;" 
          src="https://media.licdn.com/dms/image/v2/D4D0BAQH8VdbyuY3QhA/company-logo_200_200/company-logo_200_200/0/1704270419417?e=2147483647&v=beta&t=QREDXpthLMxwOr3K-E9yNU-4jbZPAHGiPHMSGmv3pGQ" 
@@ -536,16 +591,15 @@ color: white;
     
     
     <div class="user-icon">
-        <button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
-        <div class="user-details">
-            <p><strong th:text="'Name: ' + ${user1.firstname} +' ' + ${user1.lastname}"></strong></p>
-            <a href="/profile">Profile</a>
-            <a href="/settings">Settings</a>
-            <a href="/logout">Logout</a>
-        </div>
+			<button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
+			 <div class="user-details">
+        <i class="fas fa-user user-image-large"></i>
+        <p class="user-name" th:text="'' + ${user1.firstname} +' ' + ${user1.lastname}">Sameer</p>
+        <a style="color:white;" th:href="@{/logout}" class="edit-button">Edit</a>
+        <a style="color:white;" th:href="@{/logout}" class="logout-button">Logout</a>
     </div>
-</div>
-
+		</div>
+	</div>
 
  <!-- Sidebar for User Details -->
     <div class="user-details-sidebar">
@@ -593,7 +647,7 @@ color: white;
             <div class="task-option" onclick="showDepositeAmountDiv()">Deposit Amount</div>
             <div class="task-option" onclick="showWithdrawAmountDiv()">Withdraw</div>
             <div class="task-option" onclick="showHoldDiv()">Add Hold</div>
-            <div class="task-option" onclick="showWithdrawAmountDiv()">Add Order</div>
+            <div class="task-option" onclick="showOrderDiv()">Add Order</div>
 
         </div>
     </div>
@@ -705,16 +759,75 @@ color: white;
          <strong>Name:</strong>
             <span th:text="${account.accountHolderName}"></span>
             <br><br>
-			<form id="credit" th:action="@{/withdraw}" method="post" th:object="${transaction}">
-             <strong>Account No:</strong>
+           
+			<form id="credit" th:action="@{/add_hold}" method="post" th:object="${transaction}">
+			<strong>Account No:</strong>
             <input  style="width: 130px; height: 6px;" type="text" id="accountNo" name="accountNo" th:value="${account.accountNo}" required readonly /> 
             <br><br>
-           
-			<strong>Date:</strong>
-            <input type="date"  style="width: 130px; height: 6px;"id="HDtransactionDate" name="transactionDate" required />
+			
+            <label for="Camount"><strong>Enter Amount:</strong><input style="width: 100px; height: 6px;" type="number" id="Damount" name="holdAmount" required></label>
             <br><br>
-            <label for="Camount"><strong>Enter Amount:</strong><input style="width: 100px; height: 6px;" type="number" id="Damount" name="amount" required></label>
-            <br>
+            <strong>Hold Type:</strong>
+            <select id="holdType" name="holdType"style="justify-content:center ; height: 32px; width: 40%;border: 4px solid #ccc;border-radius: 5px;" onchange="setExpiryDate()">
+        <option value="">Select Type</option>
+        <option value="large">Large</option>
+        <option value="medium">Medium</option>
+        <option value="small">Small</option>
+    </select>
+            <br><br>
+            <strong>Created Date:</strong>
+            <input type="date"  style="width: 130px; height: 6px;"id="HDtransactionDate" name="holdCreatedDate" required />
+            <br><br>
+            <strong>Expiry Date:</strong>
+            <input type="date"  style="width: 130px; height: 6px;"id="HDExptransactionDate" name="holdExpireeDate" required />
+            <br><br>
+            <button type="submit">Submit</button>
+        </form>
+        
+    </div>
+</div>
+
+
+<!-- Order Modal -->
+<div class="modal" id="orderModal">
+    <div class="modal-content">
+        <h2>Order</h2>
+            <br><br>
+           
+			<form id="credit" th:action="@{/order/{customerId}/{accountNo}(customerId=${customer.id}, accountNo=${account.accountNo})}" method="post" th:object="${order}">
+			<strong>Order Type:</strong>
+            <select id="orderType" name="orderType"style="justify-content:center ; height: 32px; width: 50%;border: 4px solid #ccc;border-radius: 5px;" >
+        <option value="">Select Type</option>
+        <option value="Book Order">Book Order</option>
+        <option value="Collection Order">Collection Order</option>
+           </select>
+           <br><br>
+           <strong>Bank Type:</strong>
+            <select id="bankType" name="bankType"style="justify-content:center ; height: 32px; width: 40%;border: 4px solid #ccc;border-radius: 5px;" onchange="toggleBankNameInput()">
+        <option value="">Select Type</option>
+        <option value="Internal">Internal</option>
+        <option value="External">External</option>
+           </select>
+           <br><br>
+           
+            <div id="bankNameDiv" style="display: none;">
+                <label for="bankName"><strong>Bank Name:</strong>
+                    <input style="width: 150px; height: 6px;" type="text" id="bankName" name="bankName">
+                </label>
+                <br><br>
+                <label for="Camount"><strong>IFSC code:</strong><input style="width: 130px; height: 6px;" type="text" id="ToAccNo" name="bankIfsc" ></label>
+            <br><br>
+			<label for="Camount"><strong>Branch Name:</strong><input style="width: 130px; height: 6px;" type="text" id="ToAccNo" name="bankBranch" ></label>
+            <br><br>
+            </div>
+            
+            <label for="Camount"><strong>To Account No:</strong><input style="width: 130px; height: 6px;" type="text" id="ToAccNo" name="orderAccNo" required></label>
+            <br><br>
+            
+            <label for="Camount"><strong>Amount:</strong><input style="width: 100px; height: 6px;" type="number" id="oAmount" name="oAmount" required></label>
+            <br><br>
+          
+            
             <button type="submit">Submit</button>
         </form>
         
@@ -725,13 +838,14 @@ color: white;
 
 
 
+
 <!-- Third Navbar -->
     <div class="third-navbar">
     <div class="navbar-links">
         <a th:href="@{/saving_acc/{customerId}/{accountNo}(customerId=${customer.id}, accountNo=${account.accountNo})}" class="active" >Overview</a>
-<a th:href="@{/savings_acc_transacation/{customerId}/{accountNo}(customerId=${customer.id}, accountNo=${account.accountNo})}">Transaction</a>
-        <a href="/hold">Hold</a>
-        <a href="/order">Order</a>
+		<a th:href="@{/savings_acc_transacation/{customerId}/{accountNo}(customerId=${customer.id}, accountNo=${account.accountNo})}">Transaction</a>
+        <a th:href="@{/hold_transacation/{customerId}/{accountNo}(customerId=${customer.id}, accountNo=${account.accountNo})}">Hold</a>
+        <a th:href="@{/savings_acc_order/{customerId}/{accountNo}(customerId=${customer.id}, accountNo=${account.accountNo})}" >Order</a>
         <a href="/documents">Documents</a>
          
     </div>
@@ -763,18 +877,56 @@ color: white;
         <strong>Deposit Amount:</strong>
         <span th:text="${account.depositAmount}"></span>
     </div>
-    <div class="info-field">
-        <strong>Hold:</strong>
-        <span th:text="${account.hold}"></span> 
-    </div>
+    
     <div class="info-field">
     <strong>Total Amount:</strong>
     <span th:if="${transaction.totalAmount != null}" th:text="${transaction.totalAmount}"></span>
     <span th:if="${transaction.totalAmount == null}" th:text="${account.depositAmount}"></span>
 </div>
+<div class="info-field">
+        <strong></strong>
+        <span></span> 
+    </div>
+</div>
+<br><br>
 
+ <!-- Hold Details -->
+             
+         <div th:each="hold, iterStat : ${holds}">
+        <div class="info-row">
+            <div class="info-field">
+                <strong th:text="${iterStat.index + 1} + '. Hold Type:'"></strong>
+                <span th:text="${hold.holdType}"></span>
+            </div>
+            <div class="info-field">
+                <strong>Hold Amount:</strong>
+                <span th:text="${hold.holdAmount}"></span>
+            </div>
+            <div class="info-field">
+                <strong>Status:</strong>
+                <span th:text="${hold.holdStatus}"></span>
+            </div>
+        </div>
+         <div class="info-row">
+            <div class="info-field">
+                <strong>Hold Created Date:</strong>
+                <span th:text="${hold.holdCreatedDate}"></span>
+            </div>
+            <div class="info-field">
+                <strong>Hold Expiry Date</strong>
+                <span th:text="${hold.holdExpireeDate}"></span>
+            </div>
+            <div class="info-field">
+                <strong></strong></strong>
+                <span></span>
+            </div>
+        </div>
+    
 </div>
-</div>
+
+
+
+
 
 
 <div style="display: flex; justify-content: center; margin-top: 100px; padding-left: -50px;">
@@ -804,6 +956,49 @@ color: white;
 
     <!-- Scripts -->
     <script>
+
+
+	 function toggleBankNameInput() {
+        var bankType = document.getElementById("bankType").value;
+        var bankNameDiv = document.getElementById("bankNameDiv");
+
+        if (bankType === "External") {
+            bankNameDiv.style.display = "block";  // Show the Bank Name input
+        } else {
+            bankNameDiv.style.display = "none";   // Hide the Bank Name input
+        }
+    }
+	
+    function setExpiryDate() {
+        var holdType = document.getElementById('holdType').value;
+        var createdDate = document.getElementById('HDtransactionDate').value;
+        var expiryDateField = document.getElementById('HDExptransactionDate');
+
+        // Ensure a valid created date is selected
+        if (createdDate) {
+            var createdDateObj = new Date(createdDate);
+
+            // Calculate expiry date based on hold type
+            if (holdType === 'large') {
+                createdDateObj.setFullYear(createdDateObj.getFullYear() + 1); // Add 1 year
+            } else if (holdType === 'medium') {
+                createdDateObj.setMonth(createdDateObj.getMonth() + 3); // Add 3 months
+            } else if (holdType === 'small') {
+                createdDateObj.setDate(createdDateObj.getDate() + 10); // Add 10 days
+            }
+
+            // Format the expiry date as yyyy-mm-dd
+            var expiryDate = createdDateObj.toISOString().split('T')[0];
+
+            // Set the expiry date field value
+            expiryDateField.value = expiryDate;
+             } 
+             else 
+             {
+            expiryDateField.value = '';
+             }
+            }
+
 
     function toggleUserDetails(event) {
             event.stopPropagation(); // Prevent the event from propagating to the document
@@ -907,6 +1102,12 @@ function showHoldDiv() {
 
     HDsetTodayDate();
 }    
+    
+    
+function showOrderDiv() {
+    document.getElementById('orderModal').style.display = 'block';
+    hideTaskOptions(); // Hide the task options when showing the modal
+}
     
     
     

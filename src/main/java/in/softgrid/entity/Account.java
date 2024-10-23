@@ -1,6 +1,7 @@
 package in.softgrid.entity;
 
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -19,17 +20,6 @@ public class Account {
     @Column(name = "account_no", unique = true)
     private String accountNo;
     
-    @Column(name = "Hold")
-    private long hold;
-    
-    public long getHold() {
-		return hold;
-	}
-
-	public void setHold(long hold) {
-		this.hold = hold;
-	}
-
 	@Column()
     private String branch;
 
@@ -46,7 +36,7 @@ public class Account {
     private String accountType;
     
     @Column(name = "deposit_amount")
-    private long depositAmount;
+    private Long depositAmount;
 
     public long getDepositAmount() {
 		return depositAmount;
@@ -60,7 +50,6 @@ public class Account {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-	 // One-to-Many Relationship with Transaction
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactions;
 
@@ -73,7 +62,32 @@ public class Account {
         this.transactions = transactions;
     }
     
+    
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Hold> holds;
 
+    public List<Hold> getHolds() {
+        return holds;
+    }
+
+    public void setHolds(List<Hold> holds) {
+        this.holds = holds;
+    }
+    
+    
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders;
+    
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+    
+    
     public Long getId() {
         return id;
     }

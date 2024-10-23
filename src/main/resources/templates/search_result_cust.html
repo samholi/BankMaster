@@ -270,7 +270,114 @@
 		 .search_div {
 		     margin-left: 40%;
 		 }      
-		       
+		 
+		 
+.task-options {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 100%; /* Position below the button */
+    right: 0; /* Align with the right of the button */
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1070;
+    border-radius: 7px;
+    width: 160px;
+ 
+}
+.task-options1 {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 100%; /* Position below the button */
+    right: 0; /* Align with the right of the button */
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1070;
+    border-radius: 7px;
+    width: 160px;
+ 
+}
+
+.task-option {
+    padding: 12px 16px;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+    
+}
+.task-option1 {
+    padding: 12px 16px;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+    
+}
+
+.task-option:hover {
+    background-color: #ddd;
+}
+
+.task-option1:hover {
+    background-color:  rgb(89, 172, 255);
+}
+		 
+
+.user-details {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    z-index: 1;
+}
+
+.user-image-large {
+    font-size: 50px;
+    color: #333;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.logout-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color:  #dc3545;
+    color: black;
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.edit-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: rgb(0, 138, 0);
+    color: white;
+font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Show user details on button click */
+.user-icon.active .user-details {
+    display: block;
+}
+
+      
 		       
 		
 	</style>
@@ -285,12 +392,12 @@
 		
 		<div class="user-icon">
 			<button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
-			<div class="user-details">
-           <p><strong th:text="'Name: ' + ${user1.firstname} +' ' + ${user1.lastname}"></strong></p>
-				<a th:href="@{/profile}">Profile</a>
-				<a th:href="@{/settings}">Settings</a>
-				<a th:href="@{/logout}">Logout</a>
-			</div>
+			 <div class="user-details">
+        <i class="fas fa-user user-image-large"></i>
+        <p class="user-name" th:text="'' + ${user1.firstname} +' ' + ${user1.lastname}">Sameer</p>
+        <a style="color:white;" th:href="@{/logout}" class="edit-button">Edit</a>
+        <a style="color:white;" th:href="@{/logout}" class="logout-button">Logout</a>
+    </div>
 		</div>
 	</div>
 
@@ -305,12 +412,13 @@
 	<!-- Menu Container with Dropdown -->
 	<div class="menu-container">
 		<ul>
-			<li class="dropdown-menu">
+			<li class="dropdown-menu" onclick="toggleTaskOptions1()">
 				<i class="fas fa-search"></i>
-				<select onchange="handleDropdownChange(event)">
-					<option value="/search-customer">Customer</option>
-					<option value="/search-organization">Organization</option>
-				</select>
+				<label >Search</label>
+				 <div class="task-options1" id="taskOptions1" style="display: none;">
+            <div class="task-option1"><a  onclick="redirectToSearchCustomer()">Customer</a></div>
+            <div class="task-option1"><a  onclick="redirectToSearchOrganization()">Organization</a></div>
+        </div>
 			</li>
 			<li><i class="fas fa-user"></i><a th:href="@{/user}">User</a></li>
 			<li><i class="fas fa-file-alt"></i><a th:href="@{/report}">Report</a></li>
@@ -364,6 +472,32 @@
 
 	<!-- Scripts -->
 	<script>
+		
+		function redirectToSearchCustomer() {
+        window.location.href = "/home"; // Change this path to your add customer URL
+    }
+
+    function redirectToSearchOrganization() {
+        window.location.href = "/home_search_org"; // Change this path to your add organization URL
+    }
+		
+		
+		 function toggleTaskOptions1() {
+    const taskOptions = document.getElementById('taskOptions1');
+    if (taskOptions.style.display === 'none' || taskOptions.style.display === '') {
+      taskOptions.style.display = 'block';
+    } else {
+      taskOptions.style.display = 'none';
+    }
+  }
+  // Hide task options
+function hideTaskOptions1() {
+    const taskOptions = document.getElementById('taskOptions1');
+    taskOptions.style.display = 'none';
+}
+
+		
+		
 		function toggleUserDetails(event) {
 			event.stopPropagation(); // Prevent the event from propagating to the document
 			var userIcon = document.querySelector('.user-icon');

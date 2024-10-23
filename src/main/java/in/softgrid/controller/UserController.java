@@ -24,36 +24,38 @@ public class UserController {
 
     @GetMapping("/register")
     public String openRegister(Model model) {
-        model.addAttribute("user", new User()); // Add an empty User object to the model
+        model.addAttribute("user", new User()); 
         return "register.html";
     }
 
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("user") User user1) {
+    public String registerUser(@ModelAttribute("user") User user1, Model model) {
         userService.registerUser(user1);
-        return "redirect:/success";
+        model.addAttribute("successMessage", "Registered Successfully");
+        model.addAttribute("user", new User());  
+        return "register.html";
     }
+
 
 
     @GetMapping("/login")
     public String login(Model model) 
     {
-    	model.addAttribute("user1", new User()); // Add an empty User object to the model
-        return "login.html";
+    	model.addAttribute("user1", new User()); 
+        return "index.html";
     }
 
     @PostMapping("/login")
-    public String loginUser(@ModelAttribute("user1") User user, HttpSession session) {
+    public String loginUser(@ModelAttribute("user1") User user, Model model, HttpSession session) {
         User V_user = userService.validateUser(user);
 
         if (V_user != null) {
-            session.setAttribute("loggedInUser", V_user); // Store user information in the session
-            System.out.println("User logged in: " + V_user.getFirstname()+" "+ V_user.getLastname()); // Log user email
-
+            session.setAttribute("loggedInUser", V_user); 
             return "redirect:/home";
         } else {
-            return "redirect:/errorr";
+            model.addAttribute("error", "Invalid login details.");
+            return "index.html"; 
         }
     }
 
@@ -62,7 +64,7 @@ public class UserController {
 
 	
 	  @GetMapping("/success") public String Opensuccess(Model model) {
-	  model.addAttribute("user", new User()); // Add a new user object if neededfor binding 
+	  model.addAttribute("user", new User()); 
 	  return "success.html"; }
 	 
 
@@ -76,7 +78,7 @@ public class UserController {
     public String openWelcome(@RequestParam String firstname, HttpSession session, HttpServletRequest request,Model model) {
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user1", new User());
-        // Log request details
+
         System.out.println("Request URI: " + request.getRequestURI());
         System.out.println("Request URL: " + request.getRequestURL());
         System.out.println("Request Method: " + request.getMethod());
@@ -98,11 +100,10 @@ public class UserController {
     {
     	User user = (User) session.getAttribute("loggedInUser");
     	if (user != null) {
-            // Add the user to the model
             model.addAttribute("user1", user);
         } else {
-            // Handle case where user is not found in the session
-            return "redirect:/login"; // Or handle as needed
+            
+            return "redirect:/login";
         }
         return "home_search_customer.html";
     }
@@ -114,15 +115,13 @@ public class UserController {
     
     @GetMapping("/logout")
     public String logout(HttpSession session , Model model) {
-        // Invalidate the session to log the user out
-       // session.invalidate();
+      
     	User user = (User) session.getAttribute("loggedInUser");
     	if (user != null) {
-            // Add the user to the model
+           
             model.addAttribute("user1", user);
         } else {
-            // Handle case where user is not found in the session
-            return "redirect:/login"; // Or handle as needed
+            return "redirect:/login"; 
         }
     	
     	

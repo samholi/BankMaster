@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import in.softgrid.entity.Account;
+import in.softgrid.entity.Hold;
 import in.softgrid.entity.Transaction;
+import in.softgrid.repositary.HoldRepository;
 import in.softgrid.repositary.TransactionRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,22 +20,41 @@ public class TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private HoldRepository holdRepository;
 
     @Autowired
     private AccountService accountService;
     
     
     
+    public double getLastTransactionTotalAmountByAccountNo(String accountNo) {
+        List<Transaction> transactions = transactionRepository.findTopByAccount_AccountNoOrderByTransactionDateDesc(accountNo);
+        if (!transactions.isEmpty()) {
+            return transactions.get(0).getTotalAmount() != null ? transactions.get(0).getTotalAmount() : 0.0;
+        }
+        return 0.0; // Return 0.0 if no transactions found
+    }
+    
+    
+    
+    
+    public List<Transaction> findByAccountNo(String accountNo) {
+        return transactionRepository.findByAccount_AccountNo(accountNo);
+    }
+    
     public List<Transaction> findTransactionsByAccountId(Long accountId) {
-        // Use the repository method to fetch transactions by account ID
         return transactionRepository.findByAccountId(accountId);
     }
     
- // Method to get the latest transaction for a specific account
     public Transaction findLatestTransactionForAccount(String accountNo) {
-        Pageable pageable = PageRequest.of(0, 1); // Fetch the latest transaction
+        Pageable pageable = PageRequest.of(0, 1); 
         List<Transaction> transactions = transactionRepository.findLatestTransactionForAccount(accountNo, pageable);
         return transactions.isEmpty() ? null : transactions.get(0);
+    }
+    
+    public void save(Transaction transaction) {
+        transactionRepository.save(transaction); 
     }
     
     
@@ -46,18 +67,13 @@ public class TransactionService {
             throw new RuntimeException("Account not found with account number: " + accountNo);
         }
 
-     // Fetch all previous transactions to calculate total amount
         List<Transaction> previousTransactions = transactionRepository.findByAccountId(account.getId());
 
-     // Check if there are no previous transactions
         long totalAmount;
         if (previousTransactions.isEmpty()) {
-            // If no previous transactions, use the deposit amount from the account and add the new amount
             totalAmount = account.getDepositAmount() + amount;
         } else {
-            // Get the last transaction to find the previous total amount
             Transaction lastTransaction = previousTransactions.get(previousTransactions.size() - 1);
-            // Set the new total amount based on the last transaction's total amount
             totalAmount = lastTransaction.getTotalAmount() + amount;
         }
 
@@ -89,18 +105,13 @@ public class TransactionService {
             throw new RuntimeException("Account not found with account number: " + accountNo);
         }
 
-     // Fetch all previous transactions to calculate total amount
         List<Transaction> previousTransactions = transactionRepository.findByAccountId(account.getId());
 
-     // Check if there are no previous transactions
         long totalAmount;
         if (previousTransactions.isEmpty()) {
-            // If no previous transactions, use the deposit amount from the account and add the new amount
             totalAmount = account.getDepositAmount() + amount;
         } else {
-            // Get the last transaction to find the previous total amount
             Transaction lastTransaction = previousTransactions.get(previousTransactions.size() - 1);
-            // Set the new total amount based on the last transaction's total amount
             totalAmount = lastTransaction.getTotalAmount() + amount;
         }
 
@@ -127,46 +138,44 @@ public class TransactionService {
     @Transactional
     public void withdrawTransaction(String accountNo, long amount, String transactionType, LocalDate transactionDate) {
 
-        // Fetch the account by account number
     	
         Account account = accountService.findAccountByAccountNo(accountNo);
         if (account == null) {
             throw new RuntimeException("Account not found with account number: " + accountNo);
         }
 
-        // Fetch all previous transactions to calculate the total amount
         List<Transaction> previousTransactions = transactionRepository.findByAccountId(account.getId());
 
-        // Calculate the current total amount
         long totalAmount;
         if (previousTransactions.isEmpty()) {
-            // If no previous transactions, use the deposit amount from the account
             totalAmount = account.getDepositAmount();
         } else {
-            // Get the last transaction to find the previous total amount
             Transaction lastTransaction = previousTransactions.get(previousTransactions.size() - 1);
             totalAmount = lastTransaction.getTotalAmount();
         }
+        
+        
+        List<Hold> holds = holdRepository.findByAccountId(account.getId());
+        long totalHoldAmount = holds.stream()
+                .filter(hold -> "Active".equals(hold.getHoldStatus()))
+                .mapToLong(Hold::getHoldAmount) 
+                .sum();
 
-        // Calculate remaining balance after withdrawal
         long remainingBalance = totalAmount - amount;
 
-        // Ensure that the remaining balance is not less than the hold amount
-        if (remainingBalance < account.getHold()) {
-            throw new RuntimeException("Withdrawal denied! The remaining balance after withdrawal cannot be less than the hold amount.");
+        if (remainingBalance < totalHoldAmount) {
+            throw new RuntimeException("Withdrawal denied! The remaining balance after withdrawal cannot be less than the total of the hold amounts: " + totalHoldAmount);
         }
 
-        // Update the total amount after withdrawal
         totalAmount = totalAmount - amount;
 
-        // Create and save a new transaction
         Transaction transaction=new Transaction();
         transaction.setTransactionType("WithDraw");
         transaction.setAmount(amount);
         transaction.setTransactionType(transactionType);
         transaction.setTransactionDate(transactionDate);
         transaction.setTotalAmount(totalAmount); 
-        transaction.setAccount(account); // Associate the account with the transaction
+        transaction.setAccount(account); 
 
         
         transactionRepository.save(transaction);
@@ -180,46 +189,38 @@ public class TransactionService {
     @Transactional
     public void debitTransaction(String accountNo, long amount, String transactionType, LocalDate transactionDate) {
 
-        // Fetch the account by account number
     	
         Account account = accountService.findAccountByAccountNo(accountNo);
         if (account == null) {
             throw new RuntimeException("Account not found with account number: " + accountNo);
         }
 
-        // Fetch all previous transactions to calculate the total amount
         List<Transaction> previousTransactions = transactionRepository.findByAccountId(account.getId());
 
-        // Calculate the current total amount
         long totalAmount;
         if (previousTransactions.isEmpty()) {
-            // If no previous transactions, use the deposit amount from the account
             totalAmount = account.getDepositAmount();
         } else {
-            // Get the last transaction to find the previous total amount
             Transaction lastTransaction = previousTransactions.get(previousTransactions.size() - 1);
             totalAmount = lastTransaction.getTotalAmount();
         }
 
-        // Calculate remaining balance after withdrawal
+        List<Hold> holds = holdRepository.findByAccountId(account.getId());
+        long totalHoldAmount = holds.stream().mapToLong(Hold::getHoldAmount).sum(); 
         long remainingBalance = totalAmount - amount;
 
-        // Ensure that the remaining balance is not less than the hold amount
-        if (remainingBalance < account.getHold()) {
-            throw new RuntimeException("Debit denied! The remaining balance after withdrawal cannot be less than the hold amount.");
+        if (remainingBalance < totalHoldAmount) {
+            throw new RuntimeException("Debit denied! The remaining balance after withdrawal cannot be less than the total of the hold amounts: " + totalHoldAmount);
         }
-
-        // Update the total amount after withdrawal
         totalAmount = totalAmount - amount;
 
-        // Create and save a new transaction
         Transaction transaction=new Transaction();
         transaction.setTransactionType("WithDraw");
         transaction.setAmount(amount);
         transaction.setTransactionType(transactionType);
         transaction.setTransactionDate(transactionDate);
         transaction.setTotalAmount(totalAmount); 
-        transaction.setAccount(account); // Associate the account with the transaction
+        transaction.setAccount(account); 
 
         
         transactionRepository.save(transaction);

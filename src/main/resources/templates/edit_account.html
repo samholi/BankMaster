@@ -60,7 +60,9 @@
 }
 
 .navbar .detail-item {
-    margin-right: 20px;
+    margin-right: 45px;
+        margin-left: 7%;
+
     white-space: nowrap;
 }
         .navbar .logout-button a:hover {
@@ -395,6 +397,61 @@
 		}
 
 
+.user-details {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    z-index: 1;
+}
+
+.user-image-large {
+    font-size: 50px;
+    color: #333;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.logout-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color:  #dc3545;
+    color: black;
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.edit2-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: rgb(0, 138, 0);
+    color: white;
+font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Show user details on button click */
+.user-icon.active .user-details {
+    display: block;
+}
 
         
     </style>
@@ -406,36 +463,25 @@
          src="https://media.licdn.com/dms/image/v2/D4D0BAQH8VdbyuY3QhA/company-logo_200_200/company-logo_200_200/0/1704270419417?e=2147483647&v=beta&t=QREDXpthLMxwOr3K-E9yNU-4jbZPAHGiPHMSGmv3pGQ" 
          alt="Logo" class="logo">
     
-    <div class="customer-details">
+     <div class="customer-details">
     <span class="detail-item"><strong> Name:</strong> <span th:text="${customer.firstname} + ' ' + ${customer.lastname}"></span></span>
-    
-    
- 
-    
-    <div  class="customer-details">
-        <strong>Account No:</strong>
-        <span th:each="account, iterStat : ${customer.accounts}"
-              th:text="${iterStat.last ? account.accountNo : account.accountNo + ' ,  '}">
-        </span>
-    </div>
+        <span class="detail-item"><strong> Phone No: </strong> <span th:text="${customer.phone}"></span></span>
+          <span class="detail-item"><strong> DOB: </strong> <span th:text="${customer.dob}"></span></span>
+			    <span class="detail-item"><strong>Email:</strong> <span th:text="${customer.email}"></span></span>
 
-   <div  class="customer-details"> <span class="detail-item"><strong>Phone No:</strong> <span th:text="${customer.phone}"></span></span></div>
-    <span class="detail-item"><strong>Email:</strong> <span th:text="${customer.email}"></span></span>
 </div>
     
-    <div class="logout-button">
-        <a href="/logout">Logout</a>
-    </div>
+    
     <div class="user-icon">
-        <button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
-        <div class="user-details">
-            <p><strong th:text="'Name: ' + ${user1.firstname} +' ' + ${user1.lastname}"></strong></p>
-            <a href="/profile">Profile</a>
-            <a href="/settings">Settings</a>
-            <a href="/logout">Logout</a>
-        </div>
+			<button onclick="toggleUserDetails(event)"><i class="fas fa-user"></i></button>
+			 <div class="user-details">
+        <i class="fas fa-user user-image-large"></i>
+        <p class="user-name" th:text="'' + ${user1.firstname} +' ' + ${user1.lastname}">Sameer</p>
+        <a style="color:white;" th:href="@{/logout}" class="edit2-button">Edit</a>
+        <a style="color:white;" th:href="@{/logout}" class="logout-button">Logout</a>
     </div>
-</div>
+		</div>
+	</div>
 
 
  <!-- Sidebar for User Details -->

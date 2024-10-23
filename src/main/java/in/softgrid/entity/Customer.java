@@ -2,7 +2,6 @@ package in.softgrid.entity;
 
 import jakarta.persistence.Entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,6 +27,17 @@ public class Customer {
 	@Column
     private String phone;
   
+	@Column
+    private String gender;
+	
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
 	@Column
     private LocalDate dob;
 	
@@ -76,7 +86,7 @@ public class Customer {
 
 	//--------------------------Profile image-------------------------//
       @Lob
-      @Column(name = "profile_image")
+      @Column(name = "profile_image", columnDefinition = "BLOB")
       private byte[] profileImage;
       
       
@@ -94,6 +104,18 @@ public class Customer {
           this.accounts = accounts;
       }
 //-------------------------------------------------------------------------------------------------------------------------------//
+      
+      @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+      private List<Contact> contacts;
+
+      public List<Contact> getContacts() {
+          return contacts;
+      }
+
+      public void setContacts(List<Contact> contacts) {
+          this.contacts = contacts;
+      }
+
 //-------------------------------------------------------------------------------------------------------------------------------//
       
 

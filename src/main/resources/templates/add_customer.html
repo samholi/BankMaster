@@ -253,7 +253,7 @@
 			justify-content: center;
 			align-items: center;
 			padding-right: 410px;
-			padding-top: 50px;
+			padding-top: 40px;
 		}
 
 		.form-box {
@@ -324,8 +324,9 @@
 			padding: 10px;
 			margin-left: 15px;
 			border: none;
-			background-color: #f8f9fa;
 			font-size: 15px;
+						border: 1px solid #ccc;
+
 			cursor: pointer;
 			border-radius: 5px;
 			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -394,6 +395,7 @@
 		<div class="form-menu">
 			<button class="active" onclick="showForm('basic-info')">Basic Info</button>
 			<button onclick="showForm('account-details')">Account Details</button>
+			<button onclick="showForm('hold-details')">Hold Details</button>
 			<button onclick="showForm('education-details')">Education Details</button>
 			<button onclick="showForm('upload-document')">Upload Document</button>
 		</div>
@@ -413,6 +415,13 @@
 					<div class="form-group">
 						<label for="lname">Last Name:</label>
 						<input type="text" id="lname" name="lastname" required>
+					</div>
+					<div class="form-group Account-type">
+						<label for="accountType">Gender:</label>
+						<select style="width: 40%;" id="accountType" name="gender" required>
+							<option value="male">Male</option>
+							<option value="female">Female</option>
+						</select>
 					</div>
 					<div class="form-group">
 						<label for="email">Email:</label>
@@ -466,15 +475,40 @@
 						<label for="deposite">Deposit Amount:</label>
 						<input type="number" id="deposite" name="deposite_amount" required>
 					</div>
-					<div class="form-group">
-						<label for="hold">Hold Amount:</label>
-						<input type="number" id="hold" name="hold" required>
-					</div>
+					
 					<div class="submit-button">
 
-						<button type="button" onclick="validateForm(),showForm('education-details')">Next</button>
+						<button type="button" onclick="validateForm(),showForm('hold-details')">Next</button>
 					</div>
 				</div>
+               
+                 <!-- Hold Details Form -->
+				<div id="hold-details" class="form-box">
+					<h2>Hold Details</h2>
+				<div class="form-group">
+						<label for="hold">Hold Amount:</label>
+						<input type="number" id="hold" name="holdAmount" required>
+					</div>		
+				<div class="form-group Account-type">
+						<label for="holdType">Hold Type:</label>
+						 <select id="holdType" name="holdType" onchange="setExpiryDate()" required>
+							<option value="large">Large</option>
+							<option value="medium">Medium</option>
+							<option value="small">Small</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="holdcreatedDate">Hold Created Date:</label>
+						<input type="date" id="holdCreatedDate" name="holdCreatedDate" required>
+					</div>
+					<div class="form-group">
+       			    <label for="holdExpireeDate">Hold Expiry Date:</label>
+        			<input type="date" id="holdExpireeDate" name="holdExpireeDate" required readonly>
+    				</div>
+					<div class="submit-button">
+						<button type="button"  onclick="validateHoldAmount()">Next</button>
+					</div>
+				</div> 
 
 				<!-- Education Details Form -->
 				<div id="education-details" class="form-box">
@@ -492,11 +526,10 @@
 						<input type="text" id="university" name="university" required>
 					</div>
 					<div class="submit-button">
-						<button type="button" onclick="showForm('upload-document')">Next</button>
+						<button type="button" onclick="showForm('upload-document')","setTodayAsUploadDate()">Next</button>
 					</div>
 				</div>
 
-				<!-- Upload Document Form -->
 				<!-- Upload Document Form -->
 				<div id="upload-document" class="form-box">
 					<h2>Upload Documents</h2>
@@ -561,7 +594,7 @@
 
 					<div class="form-group">
 						<label for="uploaddate">Upload Date:</label>
-						<input type="date" id="uploaddate" name="upload_date" required>
+						<input type="date" id="holdCreatedDate" name="upload_date" required>
 					</div>
 					<div class="form-group">
 						<label for="note">Note:</label>
@@ -569,7 +602,6 @@
 							placeholder="Enter your note here"></textarea>
 					</div>
 
-					<!-- More document fields if needed... -->
 					<div class="submit-button">
 						<button type="submit">Submit</button>
 					</div>
@@ -810,7 +842,72 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('docid').value = generateDocumentId();
 });
 
+//----------------------------------------validate hold-----------------------------------------------------------------------------------//
 
+	 function validateHoldAmount() {
+        // Get the deposit amount and hold amount
+        const depositAmount = parseFloat(document.getElementById('deposite').value);
+        const holdAmount = parseFloat(document.getElementById('hold').value);
+        
+        // Check if hold amount is less than deposit amount
+        if (holdAmount < depositAmount) {
+            // Proceed to the next form
+            showForm('education-details');
+        } else {
+            // Show alert message
+            alert('Hold amount must be less than the deposit amount.');
+        }
+    }
+
+
+ 
+
+//--------------------------------------------expiry date for hold---------------------------------------------------------------------------//
+
+
+
+     window.onload = function() {
+        setTodayAsCreatedDate();
+    };
+
+    function setTodayAsCreatedDate() {
+        var today = new Date();
+        var todayFormatted = today.toISOString().split('T')[0]; // Format as yyyy-mm-dd
+        document.getElementById('holdCreatedDate').value = todayFormatted;
+        setExpiryDate(); // Set expiry date based on default created date
+    }
+
+
+
+    function setExpiryDate() {
+        var holdType = document.getElementById('holdType').value;
+        var createdDate = document.getElementById('holdCreatedDate').value;
+        var expiryDateField = document.getElementById('holdExpireeDate');
+
+        // Ensure a valid created date is selected
+        if (createdDate) {
+            var createdDateObj = new Date(createdDate);
+
+            // Calculate expiry date based on hold type
+            if (holdType === 'large') {
+                createdDateObj.setFullYear(createdDateObj.getFullYear() + 1); // Add 1 year
+            } else if (holdType === 'medium') {
+                createdDateObj.setMonth(createdDateObj.getMonth() + 3); // Add 3 months
+            } else if (holdType === 'small') {
+                createdDateObj.setDate(createdDateObj.getDate() + 10); // Add 10 days
+            }
+
+            // Format the expiry date as yyyy-mm-dd
+            var expiryDate = createdDateObj.toISOString().split('T')[0];
+
+            // Set the expiry date field value
+            expiryDateField.value = expiryDate;
+             } 
+             else 
+             {
+            expiryDateField.value = '';
+             }
+            }
 	</script>
 
 </body>
